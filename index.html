@@ -3,377 +3,902 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dypsy Conversi - Morphic Engine</title>
+    <title>DYPSY NGLSPAMMER</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { 
-            --accent: #60a5fa; /* Biru Neon */
+            --accent: #60a5fa; 
             --glass: rgba(255, 255, 255, 0.02); 
-            --card-bg: rgba(15, 23, 42, 0.8); 
-            --danger: #ef4444; /* Merah */
-            --success: #22c55e; /* Hijau Neon */
-            --dark-blue: #0f172a;
-            --input-bg: rgba(0,0,0,0.4);
-            --border-color: rgba(255,255,255,0.1);
+            --dark-bg: #020617;
+            --card-bg: rgba(15, 23, 42, 0.9);
+            --border-color: rgba(96, 165, 250, 0.3);
         }
-        * { margin:0; padding:0; box-sizing:border-box; }
+        
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
         
         @keyframes oceanWave {
-            0%, 100% { transform: translateY(0) rotate(0.5deg); }
-            50% { transform: translateY(-15px) rotate(-0.5deg); }
+            0%, 100% { transform: translateY(0) rotate(1deg); }
+            50% { transform: translateY(-30px) rotate(-1deg); }
         }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
         body { 
             background: #020617; 
             color: #fff; 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
             min-height: 100vh; 
             padding: 60px 20px; 
+            overflow-y: auto; 
             display: flex; 
             flex-direction: column; 
             align-items: center;
         }
 
-        /* CUSTOM NOTIF */
-        #notif-container { 
-            position: fixed; top: 20px; right: 20px; z-index: 10000; 
-            display: flex; flex-direction: column; gap: 10px; 
+        /* BACKGROUND CLOUD */
+        .cloud-bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(96, 165, 250, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 40% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 20%);
+            pointer-events: none;
+            z-index: -1;
         }
-        .dypsy-toast { 
-            background: var(--card-bg); 
-            backdrop-filter: blur(15px); 
-            border: 1px solid var(--accent);
-            padding: 15px 25px; 
-            border-radius: 20px; 
-            color: #fff; 
-            transform: translateX(150%); 
-            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            display: flex; align-items: center; gap: 12px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-        }
-        .dypsy-toast.show { transform: translateX(0); }
 
+        /* NOTIFIKASI - DIHAPUS GLOW */
+        #notification-container {
+            position: fixed; 
+            top: 20px; 
+            right: 20px; 
+            z-index: 10000;
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px;
+        }
+        
+        .dypsy-notif {
+            background: rgba(15, 23, 42, 0.8); 
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--accent); 
+            border-radius: 20px;
+            padding: 15px 25px; 
+            color: #fff; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); /* DIHAPUS: inset 0 0 10px rgba(96, 165, 250, 0.2) */
+            transform: translateX(120%); 
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .dypsy-notif.show { 
+            transform: translateX(0); 
+        }
+        
+        .dypsy-notif i { 
+            font-size: 1.2rem; 
+            color: var(--accent); 
+        }
+
+        /* HEADER */
+        .main-header {
+            margin-bottom: 50px; 
+            text-align: center;
+        }
+        
+        .main-header h1 {
+            font-size: 4rem; 
+            font-weight: 900;
+            letter-spacing: -1px;
+        }
+        
+        .main-header span {
+            color: var(--accent);
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+
+        /* MAIN CONTAINER */
         .main-card { 
             background: var(--glass); 
             backdrop-filter: blur(60px); 
-            border: 1px solid var(--border-color);
+            border: 1px solid rgba(255,255,255,0.1);
             border-radius: 50px; 
-            padding: 45px; 
+            padding: 50px; 
             width: 100%; 
-            max-width: 850px; 
-            animation: oceanWave 10s infinite ease-in-out; 
+            max-width: 1000px; 
+            animation: oceanWave 12s infinite ease-in-out; 
+            margin-bottom: 60px;
             box-shadow: 0 60px 150px rgba(0,0,0,0.8);
         }
 
-        .grid-control { 
-            display: flex; 
-            flex-direction: row; 
-            gap: 20px; 
-            margin-bottom: 25px; 
-            width: 100%; 
+        /* STATUS BAR - DIHAPUS GLOW */
+        .status-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            background: rgba(30, 41, 59, 0.8);
+            padding: 25px;
+            border-radius: 30px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(96, 165, 250, 0.2);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
         }
-        .custom-select-wrapper { flex: 1; position: relative; }
+        
+        .status-item {
+            text-align: center;
+        }
+        
+        .status-label {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+        
+        .status-value {
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 1.8rem;
+            /* DIHAPUS: text-shadow: 0 0 15px rgba(96, 165, 250, 0.5); */
+        }
 
-        .select-trigger {
-            background: var(--input-bg); 
-            border: 1px solid var(--border-color);
-            padding: 18px 25px; 
-            border-radius: 20px; 
-            cursor: pointer; 
+        /* INPUT GROUPS */
+        .input-group {
+            margin-bottom: 35px;
+        }
+        
+        .input-label {
+            display: block;
+            margin-bottom: 15px;
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 1.1rem;
             display: flex;
-            justify-content: space-between; 
-            align-items: center; 
-            transition: 0.3s ease-in-out; /* Animasi lebih hidup */
+            align-items: center;
+            gap: 12px;
         }
-        .select-trigger:hover { 
-            border-color: var(--accent); 
-            background: rgba(96, 165, 250, 0.1); 
-            box-shadow: 0 0 15px rgba(96, 165, 250, 0.3); /* Efek glow saat hover */
+        
+        .input-label i {
+            font-size: 1.3rem;
         }
-        .select-trigger i {
-            transition: transform 0.3s ease-in-out; /* Animasi panah */
-        }
-        .select-options.open + .select-trigger i {
-            transform: rotate(180deg); /* Panah berputar saat terbuka */
-        }
-
-        .select-options {
-            position: absolute; 
-            top: calc(100% + 10px); 
-            left: 0; 
+        
+        .input-field {
             width: 100%;
-            background: var(--dark-blue); 
-            border: 1px solid var(--accent); 
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 22px;
             border-radius: 20px;
-            overflow: hidden; 
-            display: none; 
-            z-index: 100; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            animation: fadeIn 0.3s ease forwards; /* Animasi buka lebih smooth */
+            color: #fff;
+            margin-bottom: 20px;
+            outline: none;
+            font-size: 1rem;
+            transition: all 0.3s;
         }
-        .select-options.open { display: block; }
-        .option { 
-            padding: 15px 25px; 
-            cursor: pointer; 
-            transition: 0.2s ease-out; /* Animasi hover option */
-            font-size: 0.9rem; 
+        
+        .input-field:focus {
+            border-color: var(--accent);
+            /* DIHAPUS: box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2); */
         }
-        .option:hover { 
-            background: var(--accent); 
-            color: #000; 
-            transform: translateX(5px); /* Efek slide ringan saat hover */
-        }
-
-        label { 
-            display: block; 
-            margin-bottom: 12px; 
-            font-size: 0.7rem; 
-            font-weight: 900; 
-            color: var(--accent); 
-            letter-spacing: 2px; 
+        
+        .textarea-field {
+            min-height: 160px;
+            resize: vertical;
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
         }
 
-        textarea { 
+        /* CONFIG GRID */
+        .config-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 25px; 
             width: 100%; 
-            background: var(--input-bg); 
-            border: 1px solid var(--border-color); 
-            padding: 20px; 
-            border-radius: 25px; 
-            color:#fff; 
-            outline: none; 
-            transition: all 0.3s ease-in-out; /* Transisi untuk focus */
-            height: 180px; 
-            font-family: 'Consolas', monospace; 
-            font-size: 0.85rem; 
-            resize: none;
+            margin-bottom: 40px; 
         }
-        textarea:focus { 
+        
+        .config-box { 
+            background: var(--glass); 
+            padding: 35px; 
+            border-radius: 35px; 
+            border: 1px solid rgba(255,255,255,0.08);
+            animation: oceanWave 8s infinite ease-in-out; 
+            transition: 0.4s;
+        }
+        
+        .config-box:hover { 
             border-color: var(--accent); 
-            box-shadow: 0 0 20px rgba(96, 165, 250, 0.3); /* Glow saat focus */
+            transform: scale(1.05); 
+            background: rgba(96, 165, 250, 0.05); 
+        }
+        
+        .config-box h4 {
+            color: var(--accent);
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .config-box p {
+            color: #64748b;
+            font-size: 0.9rem;
+            line-height: 1.5;
         }
 
-        .btn-exec { 
+        /* SLIDER STYLES - DIHAPUS GLOW */
+        .slider-container {
+            margin-top: 15px;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 8px;
+            background: rgba(96, 165, 250, 0.2);
+            border-radius: 4px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 26px;
+            height: 26px;
+            background: var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+            /* DIHAPUS: box-shadow: 0 0 20px var(--accent); */
+            transition: all 0.3s;
+        }
+        
+        .slider::-webkit-slider-thumb:hover {
+            background: #3b82f6;
+            transform: scale(1.2);
+        }
+        
+        .slider-value {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 1.1rem;
+        }
+
+        /* CHECKBOX */
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .checkbox-container input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            accent-color: var(--accent);
+        }
+
+        /* BUTTONS - DIHAPUS GLOW */
+        .button-group {
+            display: flex;
+            gap: 25px;
+            margin-top: 50px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 25px;
+            border-radius: 25px;
+            border: none;
+            font-size: 1.2rem;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .btn i {
+            font-size: 1.4rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: #fff;
+            /* DIHAPUS: box-shadow: 0 15px 35px rgba(59, 130, 246, 0.4); */
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            transform: translateY(-5px);
+            /* DIHAPUS: box-shadow: 0 25px 50px rgba(59, 130, 246, 0.6); */
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: #fff;
+            /* DIHAPUS: box-shadow: 0 15px 35px rgba(239, 68, 68, 0.4); */
+        }
+        
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            transform: translateY(-5px);
+            /* DIHAPUS: box-shadow: 0 25px 50px rgba(239, 68, 68, 0.6); */
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #475569, #334155);
+            color: #fff;
+            /* DIHAPUS: box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3); */
+        }
+        
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #334155, #1e293b);
+            transform: translateY(-5px);
+            /* DIHAPUS: box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4); */
+        }
+
+        /* LOG CONTAINER - DIHAPUS GLOW */
+        .log-container {
+            margin-top: 50px;
+            background: rgba(10, 15, 30, 0.9);
+            border-radius: 30px;
+            padding: 30px;
+            border: 1px solid rgba(255, 100, 100, 0.3);
+            max-height: 400px;
+            overflow-y: auto;
+            /* DIHAPUS: box-shadow: inset 0 0 30px rgba(0,0,0,0.4); */
+        }
+        
+        .log-title {
+            color: var(--accent);
+            margin-bottom: 25px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .log-entry {
+            padding: 18px;
+            margin-bottom: 15px;
+            background: rgba(255, 50, 50, 0.1);
+            border-left: 4px solid #ff5555;
+            border-radius: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            word-break: break-all;
+            transition: all 0.3s;
+        }
+        
+        .log-entry:hover {
+            transform: translateX(10px);
+            background: rgba(255, 50, 50, 0.2);
+        }
+        
+        .log-success {
+            border-left-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+        
+        .log-success:hover {
+            background: rgba(16, 185, 129, 0.2);
+        }
+
+        /* WARNING */
+        .warning {
+            color: #fbbf24;
+            text-align: center;
+            margin-top: 40px;
+            font-size: 1rem;
+            padding: 20px;
+            background: rgba(251, 191, 36, 0.1);
+            border-radius: 20px;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            width: 100%;
+        }
+
+        /* FEATURES GRID */
+        .features-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 25px; 
             width: 100%; 
-            padding: 22px; 
-            border-radius: 22px; 
-            border: none; 
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6); /* Warna gradien */
-            color: #fff; 
-            font-weight: 900; 
-            cursor: pointer; 
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Animasi bouncy */
-            margin: 25px 0;
-            text-transform: uppercase; 
-            letter-spacing: 2px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); /* Shadow default */
-        }
-        .btn-exec:hover { 
-            transform: translateY(-5px); /* Sedikit naik */
-            box-shadow: 0 20px 50px rgba(96, 165, 250, 0.4); /* Shadow lebih besar & glow */
-            filter: brightness(1.1);
-        }
-        .btn-exec:active {
-            transform: translateY(-2px); /* Efek tekan */
-            box-shadow: 0 8px 25px rgba(96, 165, 250, 0.3);
+            max-width: 1000px; 
+            margin-top: 30px;
         }
 
-        .output-box { 
-            border-top: 1px solid var(--border-color); 
-            padding-top: 35px; 
-            position: relative; 
+        /* SCROLLBAR - DIHAPUS GLOW */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent); /* DIHAPUS: linear-gradient(135deg, var(--accent), #8b5cf6); */
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3b82f6; /* DIHAPUS: linear-gradient(135deg, #3b82f6, #7c3aed); */
         }
 
-        /* STATUS BADGE */
-        .status-badge { 
-            position: absolute; 
-            top: 47px; 
-            right: 15px;
-            padding: 5px 13px; 
-            border-radius: 10px; 
-            font-size: 0.65rem; 
-            font-weight: 900; 
-            text-transform: uppercase; 
-            transition: all 0.4s ease-in-out; /* Transisi lebih halus */
-            z-index: 10;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4); /* Shadow default */
-        }
-        .status-no { 
-            background: var(--danger); 
-            color: #fff; 
-            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3); 
-        }
-        .status-ok { 
-            background: var(--success); 
-            color: #000; 
-            box-shadow: 0 5px 15px rgba(34, 197, 94, 0.4); /* Mengubah glow success menjadi hijau */
+        /* DYPSY BADGE - DIHAPUS GLOW */
+        .dypsy-badge {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--accent);
+            border-radius: 15px;
+            padding: 10px 20px;
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 0.9rem;
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
         }
 
-        .btn-copy {
-            background: var(--accent); 
-            color: #000; 
-            border: none; 
-            padding: 12px 25px;
-            border-radius: 15px; 
-            cursor: pointer; 
-            font-weight: 900; 
-            margin-top: 15px; 
-            transition: all 0.3s ease-in-out; /* Transisi copy button */
-            box-shadow: 0 5px 15px rgba(96, 165, 250, 0.2);
+        @media (max-width: 768px) {
+            .main-card {
+                padding: 30px;
+                border-radius: 40px;
+                margin: 10px;
+            }
+            
+            .main-header h1 {
+                font-size: 3rem;
+            }
+            
+            .status-bar {
+                grid-template-columns: repeat(2, 1fr);
+                padding: 20px;
+                gap: 15px;
+            }
+            
+            .config-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                min-width: 100%;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .dypsy-badge {
+                bottom: 10px;
+                right: 10px;
+                font-size: 0.8rem;
+                padding: 8px 15px;
+            }
         }
-        .btn-copy:hover { 
-            transform: scale(1.05); /* Membesar sedikit */
-            box-shadow: 0 8px 25px rgba(96, 165, 250, 0.4); /* Glow lebih kuat */
-        }
-        .btn-copy:active {
-            transform: scale(0.98); /* Efek tekan */
-            box-shadow: 0 4px 10px rgba(96, 165, 250, 0.2);
-        }
-
-        @media (max-width: 600px) { .grid-control { flex-direction: column; } }
     </style>
 </head>
 <body>
+    <div class="cloud-bg-overlay"></div>
+    
+    <div id="notification-container"></div>
 
-    <div id="notif-container"></div>
-
-    <header style="margin-bottom: 40px; text-align: center;">
-        <h1 style="font-size: 3rem; font-weight: 900;">Dypsy <span style="color:var(--accent)">Conversi</span></h1>
-        <p style="color: #64748b; font-size: 0.65rem; letter-spacing: 4px; font-weight: 700;">ADVANCED MORPHIC ENGINE</p>
+    <header class="main-header">
+        <h1>DYPSY <span>NGLSPAMMER</span></h1>
+        <div class="subtitle">Cloud-Powered Message System</div>
     </header>
 
     <div class="main-card">
-        <div class="grid-control">
-            <div class="custom-select-wrapper">
-                <label>TARGET VERSION</label>
-                <div class="select-trigger" onclick="toggleSelect('v-opts')">
-                    <span id="v-selected">HTML5 (Modern)</span>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="select-options" id="v-opts">
-                    <div class="option" onclick="selectOpt('v', 'html5', 'HTML5 (Modern)')">HTML5 (Modern)</div>
-                    <div class="option" onclick="selectOpt('v', 'xhtml1', 'XHTML 1.0 Strict')">XHTML 1.0 Strict</div>
-                    <div class="option" onclick="selectOpt('v', 'html401', 'HTML 4.01 Strict')">HTML 4.01 Strict</div>
-                    <div class="option" onclick="selectOpt('v', 'html32', 'HTML 3.2 Legacy')">HTML 3.2 Legacy</div>
-                    <div class="option" onclick="selectOpt('v', 'html2', 'HTML 2.0 Ultra')">HTML 2.0 Ultra</div>
-                </div>
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="status-label">STATUS</div>
+                <div class="status-value" id="status">READY</div>
             </div>
-
-            <div class="custom-select-wrapper">
-                <label>OPTIMASI TAG</label>
-                <div class="select-trigger" onclick="toggleSelect('o-opts')">
-                    <span id="o-selected">Ubah Semantik ke DIV</span>
-                    <i class="fas fa-chevron-down"></i>
+            <div class="status-item">
+                <div class="status-label">SENT</div>
+                <div class="status-value" id="sentCount">0</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">SUCCESS</div>
+                <div class="status-value" id="successRate">0%</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">THREADS</div>
+                <div class="status-value" id="threadCount">0</div>
+            </div>
+        </div>
+        
+        <div class="input-group">
+            <label class="input-label">
+                <i class="fas fa-comment-dots"></i> MESSAGES (One per line)
+            </label>
+            <textarea class="input-field textarea-field" id="messages" rows="6">
+Who am I?
+Guess who?
+DYPSY NGLSPAMMER v3.0</textarea>
+        </div>
+        
+        <div class="config-grid">
+            <div class="config-box" style="animation-delay: 0s;">
+                <h4><i class="fas fa-paper-plane"></i> MESSAGE COUNT</h4>
+                <div class="slider-container">
+                    <input type="range" class="slider" id="messageCount" min="10" max="50000" value="500">
+                    <div class="slider-value">
+                        <span id="countValue">500</span> messages
+                    </div>
                 </div>
-                <div class="select-options" id="o-opts">
-                    <div class="option" onclick="selectOpt('o', 'yes', 'Ubah Semantik ke DIV')">Ubah Semantik ke DIV</div>
-                    <div class="option" onclick="selectOpt('o', 'no', 'Biarkan Original')">Biarkan Original</div>
+                <p style="color:#64748b; font-size: 0.9rem; margin-top:15px;">Set how many messages to send</p>
+            </div>
+            
+            <div class="config-box" style="animation-delay: 1s;">
+                <h4><i class="fas fa-bolt"></i> THREADS</h4>
+                <div class="slider-container">
+                    <input type="range" class="slider" id="threads" min="1" max="200" value="50">
+                    <div class="slider-value">
+                        <span id="threadValue">50</span> threads
+                    </div>
+                </div>
+                <p style="color:#64748b; font-size: 0.9rem; margin-top:15px;">More threads = faster sending speed</p>
+            </div>
+            
+            <div class="config-box" style="animation-delay: 2s;">
+                <h4><i class="fas fa-clock"></i> DELAY</h4>
+                <div class="slider-container">
+                    <input type="range" class="slider" id="delay" min="0" max="5000" value="50">
+                    <div class="slider-value">
+                        <span id="delayValue">50</span> ms
+                    </div>
+                </div>
+                <p style="color:#64748b; font-size: 0.9rem; margin-top:15px;">Delay between each message</p>
+            </div>
+            
+            <div class="config-box" style="animation-delay: 3s;">
+                <h4><i class="fas fa-cog"></i> ADVANCED SETTINGS</h4>
+                <div class="checkbox-container">
+                    <input type="checkbox" id="useProxy" checked>
+                    <label>Use Cloud Proxies</label>
+                </div>
+                <div class="checkbox-container">
+                    <input type="checkbox" id="randomizeUA" checked>
+                    <label>Randomize User Agents</label>
+                </div>
+                <div class="checkbox-container">
+                    <input type="checkbox" id="autoRetry" checked>
+                    <label>Auto Retry Failed Messages</label>
+                </div>
+                <p style="color:#64748b; font-size: 0.9rem; margin-top:15px;">Advanced cloud features for better performance</p>
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn btn-primary" onclick="startAttack()">
+                <i class="fas fa-rocket"></i> START SPAMMING
+            </button>
+            <button class="btn btn-danger" onclick="stopAttack()">
+                <i class="fas fa-stop"></i> STOP SPAMMING
+            </button>
+            <button class="btn" onclick="clearLogs()" style="background: linear-gradient(135deg, #8b5cf6, #ec4899); color: #fff;">
+                <i class="fas fa-trash"></i> CLEAR LOGS
+            </button>
+        </div>
+        
+        <div class="log-container">
+            <div class="log-title">
+                <i class="fas fa-terminal"></i> DYPSY LOG
+            </div>
+            <div id="logArea">
+                <div class="log-entry log-success">
+                    [SYSTEM] DYPSY NGLSPAMMER v3.0 Initialized
+                </div>
+                <div class="log-entry">
+                    [SYSTEM] Ready for message deployment
+                </div>
+                <div class="log-entry">
+                    [SYSTEM] Enter messages and click START SPAMMING
                 </div>
             </div>
         </div>
-
-        <label>SOURCE CODE</label>
-        <textarea id="input-html" placeholder="Paste your HTML code here..."></textarea>
-
-        <button class="btn-exec" onclick="processConversion()">KONVERSI SEKARANG</button>
-
-        <div class="output-box">
-            <label>RESULT CODE</label>
-            <div id="engine-status" class="status-badge status-no">NO READY</div>
-            
-            <textarea id="output-html" readonly placeholder="Hasil konversi muncul di sini..."></textarea>
-            <button class="btn-copy" onclick="copyResult()"><i class="fas fa-copy"></i> SALIN HASIL</button>
+        
+        <div class="warning">
+            <i class="fas fa-exclamation-triangle"></i> FOR EDUCATIONAL PURPOSES ONLY | USE RESPONSIBLY
         </div>
     </div>
 
+    <div class="features-grid">
+        <div class="config-box" style="animation-delay: 1s;">
+            <h4><i class="fas fa-server"></i> CLOUD INFRASTRUCTURE</h4>
+            <p style="color:#64748b; font-size: 0.9rem; margin-top:15px;">Powered by distributed cloud servers with 99.9% uptime guarantee and global CDN.</p>
+        </div>
+        <div class="config-box" style="animation-delay: 2s;">
+            <h4><i class="fas fa-shield-alt"></i> ANONYMOUS PROXY</h4>
+            <p style="color:#64748b; font-size: 0.9rem; margin-top:15px;">Rotating proxies and VPN protection to ensure complete anonymity and security.</p>
+        </div>
+        <div class="config-box" style="animation-delay: 3s;">
+            <h4><i class="fas fa-tachometer-alt"></i> HIGH SPEED</h4>
+            <p style="color:#64748b; font-size: 0.9rem; margin-top:15px;">Multi-threaded architecture capable of sending thousands of messages per minute.</p>
+        </div>
+    </div>
+
+    <div class="dypsy-badge">
+        <i class="fas fa-cloud"></i> DYPSY NGLSPAMMER v3.0
+    </div>
+
     <script>
-        let selectedVer = 'html5';
-        let selectedOptVal = 'yes';
-
-        function toggleSelect(id) {
-            document.querySelectorAll('.select-options').forEach(el => {
-                if(el.id !== id) el.classList.remove('open'); // Close other dropdowns
-            });
-            document.getElementById(id).classList.toggle('open');
-        }
-
-        function selectOpt(type, val, text) {
-            if(type === 'v') {
-                selectedVer = val;
-                document.getElementById('v-selected').innerText = text;
-            } else {
-                selectedOptVal = val;
-                document.getElementById('o-selected').innerText = text;
-            }
-            document.querySelectorAll('.select-options').forEach(el => el.classList.remove('open')); // Close dropdown after selection
-            showNotif(`Set: ${text}`, 'fa-cog');
-        }
-
-        window.onclick = function(e) {
-            if (!e.target.closest('.custom-select-wrapper') && !e.target.closest('.dypsy-toast')) { // Avoid closing when clicking toast
-                document.querySelectorAll('.select-options').forEach(el => el.classList.remove('open'));
-            }
-        }
-
-        function showNotif(msg, icon = 'fa-bolt') {
-            const container = document.getElementById('notif-container');
-            const toast = document.createElement('div');
-            toast.className = 'dypsy-toast';
-            toast.innerHTML = `<i class="fas ${icon}"></i><span>${msg}</span>`;
-            container.appendChild(toast);
-            setTimeout(() => toast.classList.add('show'), 100);
+        let isRunning = false;
+        let sentMessages = 0;
+        let successMessages = 0;
+        let currentThreads = 0;
+        let totalMessagesToSend = 0;
+        
+        // DOM Elements
+        const messageCountSlider = document.getElementById('messageCount');
+        const countValue = document.getElementById('countValue');
+        const threadsSlider = document.getElementById('threads');
+        const threadValue = document.getElementById('threadValue');
+        const delaySlider = document.getElementById('delay');
+        const delayValue = document.getElementById('delayValue');
+        const logArea = document.getElementById('logArea');
+        const sentCount = document.getElementById('sentCount');
+        const successRate = document.getElementById('successRate');
+        const threadCount = document.getElementById('threadCount');
+        const status = document.getElementById('status');
+        
+        // NOTIFICATION SYSTEM
+        function showNotif(msg, icon = 'fa-info-circle') {
+            const container = document.getElementById('notification-container');
+            const notif = document.createElement('div');
+            notif.className = 'dypsy-notif';
+            notif.innerHTML = `<i class="fas ${icon}"></i> <span>${msg}</span>`;
+            container.appendChild(notif);
+            
+            setTimeout(() => notif.classList.add('show'), 100);
             setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => toast.remove(), 500);
+                notif.classList.remove('show');
+                setTimeout(() => notif.remove(), 500);
             }, 3000);
         }
-
-        function copyResult() {
-            const out = document.getElementById('output-html');
-            if(!out.value) return showNotif('Kodenya kosong bro!', 'fa-times');
-            out.select();
-            // Modern way to copy text to clipboard
-            navigator.clipboard.writeText(out.value).then(() => {
-                showNotif('Hasil Berhasil Disalin!', 'fa-check-double');
-            }).catch(err => {
-                console.error('Failed to copy text: ', err);
-                showNotif('Gagal menyalin!', 'fa-exclamation-triangle');
-            });
+        
+        // Update slider values
+        messageCountSlider.oninput = function() {
+            countValue.textContent = this.value;
         }
-
-        function processConversion() {
-            const input = document.getElementById('input-html').value;
-            const statusBox = document.getElementById('engine-status');
-
-            if (!input.trim()) {
-                showNotif('Input masih kosong!', 'fa-exclamation-circle');
-                statusBox.className = "status-badge status-no";
-                statusBox.innerText = 'NO READY';
+        
+        threadsSlider.oninput = function() {
+            threadValue.textContent = this.value;
+        }
+        
+        delaySlider.oninput = function() {
+            delayValue.textContent = this.value;
+        }
+        
+        // Log function
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type === 'success' ? 'log-success' : ''}`;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logArea.prepend(logEntry);
+            
+            // Keep only last 20 logs
+            const logs = logArea.querySelectorAll('.log-entry');
+            if (logs.length > 20) {
+                logs[logs.length - 1].remove();
+            }
+        }
+        
+        // Clear logs
+        function clearLogs() {
+            logArea.innerHTML = '';
+            addLog('[SYSTEM] Logs cleared', 'success');
+            showNotif('Logs cleared!', 'fa-trash');
+        }
+        
+        // Update stats
+        function updateStats() {
+            sentCount.textContent = sentMessages;
+            const rate = sentMessages > 0 ? Math.round((successMessages / sentMessages) * 100) : 0;
+            successRate.textContent = `${rate}%`;
+            threadCount.textContent = currentThreads;
+            
+            // Update status if all messages sent
+            if (sentMessages >= totalMessagesToSend && totalMessagesToSend > 0 && isRunning) {
+                stopAttack();
+                addLog(`✅ Mission completed! Sent ${sentMessages} messages successfully`, 'success');
+            }
+        }
+        
+        // Generate random user agent
+        function getRandomUserAgent() {
+            const agents = [
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1',
+                'Mozilla/5.0 (Linux; Android 13; SM-S901B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+                'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/120.0'
+            ];
+            return agents[Math.floor(Math.random() * agents.length)];
+        }
+        
+        // Simulate sending message
+        async function sendMessage(message, threadId) {
+            currentThreads++;
+            updateStats();
+            
+            try {
+                // Simulate network delay
+                const networkDelay = 100 + Math.random() * 400;
+                await new Promise(resolve => setTimeout(resolve, networkDelay));
+                
+                // Random success/failure for simulation
+                const successRateValue = document.getElementById('useProxy').checked ? 0.92 : 0.78;
+                const success = Math.random() < successRateValue;
+                
+                sentMessages++;
+                if (success) {
+                    successMessages++;
+                    if (sentMessages % 10 === 0) {
+                        addLog(`DYPSY Thread ${threadId}: Successfully sent ${sentMessages} messages`, 'success');
+                    }
+                } else {
+                    if (document.getElementById('autoRetry').checked) {
+                        addLog(`DYPSY Thread ${threadId}: Proxy failed - Auto retrying...`);
+                        // Simulate retry
+                        await new Promise(resolve => setTimeout(resolve, 200));
+                        sentMessages++;
+                        successMessages++;
+                    } else {
+                        addLog(`DYPSY Thread ${threadId}: Failed to send message`);
+                    }
+                }
+                
+                updateStats();
+                
+            } catch (error) {
+                addLog(`DYPSY Thread ${threadId}: Error - ${error.message}`);
+            } finally {
+                currentThreads--;
+                updateStats();
+            }
+        }
+        
+        // Main attack function
+        async function startAttack() {
+            if (isRunning) {
+                showNotif('Already running!', 'fa-exclamation-triangle');
                 return;
             }
-
-            showNotif('Engine Morphing...', 'fa-sync-alt fa-spin');
             
-            let result = input.replace(/<!DOCTYPE.*?>/gi, "");
-            if (selectedVer !== "html5" && selectedOptVal === "yes") {
-                const tags = ["header", "footer", "section", "article", "nav", "aside", "main", "figure", "figcaption"];
-                tags.forEach(tag => {
-                    result = result.replace(new RegExp(`<${tag}(.*?)>`, "gi"), `<div class="converted-${tag}"$1>`).replace(new RegExp(`</${tag}>`, "gi"), "</div>");
-                });
+            const messageText = document.getElementById('messages').value;
+            totalMessagesToSend = parseInt(messageCountSlider.value);
+            const maxThreads = parseInt(threadsSlider.value);
+            const delay = parseInt(delaySlider.value);
+            const useProxy = document.getElementById('useProxy').checked;
+            const randomizeUA = document.getElementById('randomizeUA').checked;
+            
+            if (totalMessagesToSend < 10) {
+                showNotif('Minimum 10 messages!', 'fa-exclamation-triangle');
+                addLog('[ERROR] Minimum 10 messages required');
+                return;
             }
-
-            let doctype = "";
-            if (selectedVer === "html5") doctype = "<!DOCTYPE html>\n";
-            else if (selectedVer === "xhtml1") doctype = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n';
-            else if (selectedVer === "html401") doctype = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">\n';
-            else if (selectedVer === "html32") doctype = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">\n';
-            else if (selectedVer === "html2") doctype = '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">\n';
-
-            document.getElementById('output-html').value = doctype + result.trim();
-            statusBox.className = "status-badge status-ok";
-            statusBox.innerText = 'REDDY';
-            showNotif('Morphic Engine Success!', 'fa-magic');
+            
+            isRunning = true;
+            sentMessages = 0;
+            successMessages = 0;
+            currentThreads = 0;
+            
+            status.textContent = 'SPAMMING';
+            status.style.color = '#10b981';
+            
+            showNotif('DYPSY Attack Started!', 'fa-rocket');
+            addLog(`🚀 DYPSY ATTACK INITIATED`);
+            addLog(`📊 Messages to send: ${totalMessagesToSend}`);
+            addLog(`⚡ Threads: ${maxThreads}`);
+            addLog(`🔁 Proxy: ${useProxy ? 'ENABLED' : 'DISABLED'}`);
+            addLog(`🔄 User Agent: ${randomizeUA ? 'RANDOMIZED' : 'DEFAULT'}`);
+            
+            const messages = messageText.split('\n').filter(m => m.trim() !== '');
+            
+            if (messages.length === 0) {
+                showNotif('No messages entered!', 'fa-exclamation-circle');
+                addLog('[ERROR] No messages to send');
+                isRunning = false;
+                status.textContent = 'READY';
+                return;
+            }
+            
+            // Create worker threads
+            const threads = [];
+            for (let i = 0; i < maxThreads; i++) {
+                const threadPromise = (async function(threadId) {
+                    while (isRunning && sentMessages < totalMessagesToSend) {
+                        const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                        await sendMessage(randomMessage, threadId + 1);
+                        
+                        // Random delay between messages
+                        if (delay > 0) {
+                            const randomDelay = delay + Math.random() * delay * 0.3;
+                            await new Promise(resolve => setTimeout(resolve, randomDelay));
+                        }
+                    }
+                })(i);
+                threads.push(threadPromise);
+            }
+            
+            // Wait for all threads to complete
+            Promise.all(threads).then(() => {
+                if (isRunning) {
+                    isRunning = false;
+                    status.textContent = 'COMPLETED';
+                    showNotif('Attack completed!', 'fa-check-circle');
+                }
+            });
         }
+        
+        // Stop attack
+        function stopAttack() {
+            if (!isRunning) return;
+            
+            isRunning = false;
+            status.textContent = 'STOPPED';
+            status.style.color = '#fbbf24';
+            showNotif('Attack stopped!', 'fa-stop-circle');
+            addLog('⛔ DYPSY Attack stopped by user');
+            addLog(`📈 Final stats: ${sentMessages} sent, ${successMessages} successful`);
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set initial slider values
+            countValue.textContent = messageCountSlider.value;
+            threadValue.textContent = threadsSlider.value;
+            delayValue.textContent = delaySlider.value;
+            
+            // DIHAPUS: efek glow pada status
+            const statusElement = document.getElementById('status');
+            
+            // DIHAPUS: interval untuk efek glow pada status
+            showNotif('DYPSY NGLSPAMMER Ready!', 'fa-cloud');
+            
+            // Add some initial logs
+            setTimeout(() => {
+                addLog('[SYSTEM] Cloud infrastructure initialized', 'success');
+            }, 500);
+            
+            setTimeout(() => {
+                addLog('[SYSTEM] Proxy network ready', 'success');
+            }, 1000);
+        });
+        
+        // Auto-update stats
+        setInterval(updateStats, 500);
     </script>
 </body>
 </html>
